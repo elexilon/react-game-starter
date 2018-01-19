@@ -4,11 +4,13 @@ import { connect } from 'react-redux'
 import { fetchOneGame, fetchPlayers } from '../actions/games/fetch'
 import { connect as subscribeToWebsocket } from '../actions/websocket'
 import JoinGameDialog from '../components/games/JoinGameDialog'
+import Square from '../components/games/Square'
+import './Games.css'
 
 const playerShape = PropTypes.shape({
   userId: PropTypes.string.isRequired,
-  pairs: PropTypes.arrayOf(PropTypes.string).isRequired,
-  name: PropTypes.string
+  symbol: PropTypes.string,
+  squares: PropTypes.arrayOf(PropTypes.object)
 })
 
 class Game extends PureComponent {
@@ -20,17 +22,14 @@ class Game extends PureComponent {
       _id: PropTypes.string.isRequired,
       userId: PropTypes.string.isRequired,
       players: PropTypes.arrayOf(playerShape),
-      draw: PropTypes.bool,
       updatedAt: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
       started: PropTypes.bool,
       turn: PropTypes.number.isRequired,
-      cards: PropTypes.arrayOf(PropTypes.shape({
-        symbol: PropTypes.string,
+      square: PropTypes.arrayOf(PropTypes.shape({
         _id: PropTypes.string,
         won: PropTypes.bool,
-        visible: PropTypes.bool
-      }))
+            }))
     }),
     currentPlayer: playerShape,
     isPlayer: PropTypes.bool,
@@ -38,6 +37,22 @@ class Game extends PureComponent {
     hasTurn: PropTypes.bool
   }
 
+  constructor(props) {
+   super(props);
+   this.state = {
+     squares: Array(9).fill(null),
+
+   };
+ }
+
+ renderSquare(i) {
+  return (
+    <Square
+      value={this.state.squares[i]}
+      onClick={() => this.handleClick(i)}
+    />
+  );
+}
   componentWillMount() {
     const { game, fetchOneGame, subscribeToWebsocket } = this.props
     const { gameId } = this.props.match.params
@@ -69,6 +84,24 @@ class Game extends PureComponent {
         <p>{title}</p>
 
         <h1>YOUR GAME HERE! :)</h1>
+
+        <div>
+      <div className="game-row">
+        {this.renderSquare(0)}
+        {this.renderSquare(1)}
+        {this.renderSquare(2)}
+      </div>
+      <div className="game-row">
+        {this.renderSquare(3)}
+        {this.renderSquare(4)}
+        {this.renderSquare(5)}
+      </div>
+      <div className="game-row">
+        {this.renderSquare(6)}
+        {this.renderSquare(7)}
+        {this.renderSquare(8)}
+      </div>
+    </div>
 
         <h2>Debug Props</h2>
         <pre>{JSON.stringify(this.props, true, 2)}</pre>
